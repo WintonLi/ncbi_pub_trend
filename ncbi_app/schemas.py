@@ -22,3 +22,9 @@ class NumPubOfYear(CamelModel):
     n_pub: int
     year: int
 
+
+class PubmedHist(CamelModel):
+    web_env: str
+    query_key: int
+    count: int
+

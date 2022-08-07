@@ -4,10 +4,10 @@
 # @Author  : liyun
 # @desc    :
 import uvicorn
-from fastapi import Depends, FastAPI, status
+from fastapi import FastAPI, status
 from typing import List
-from ncbi_app.schemas import NumPubOfYear
-from ncbi_app.ncbi_api import download_trend
+from ncbi_app.schemas import NumPubOfYear, PubmedHist
+from ncbi_app.ncbi_api import download_trend, fetch_latest_pubs, get_affiliations
 from settings import settings
 from starlette.requests import Request
 from fastapi.responses import JSONResponse
@@ -54,6 +54,29 @@ async def get_trend(disease: str, min_yr: int, max_yr: int):
     :return:
     """
     return await download_trend(disease, min_yr, max_yr)
+
+
+@app.get('/latest_pubs', response_model=PubmedHist)
+async def get_latest_pubs(disease: str):
+    """
+    Search for the publication records of the given disease in the last 365 days, and return the search context
+    :param disease: name of the disease
+    :return: Search context (history)
+    """
+    return await fetch_latest_pubs(disease)
+
+
+@app.get('/institutions', response_model=List[str])
+async def get_institutions(env: str, qid: int, idx: int, retmax: int = 1000):
+    """
+    Find out the institutions that have published the articles of interest, making use of the NCBI History Server
+    :param env: NCBI historical environment
+    :param qid: NCBI query id
+    :param idx: starting index of the articles
+    :param retmax: maximum article to search
+    :return: a list of institution names
+    """
+    return await get_affiliations(env, qid, idx, retmax)
 
 
 if __name__ == "__main__":
