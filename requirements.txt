@@ -5,3 +5,4 @@ loguru>=0.6.0
 pyhumps>=3.7.2
 python-dotenv>=0.20.0
 uvicorn>=0.18.2
+xmltodict==0.13.0
